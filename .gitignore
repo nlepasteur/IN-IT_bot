@@ -4,3 +4,4 @@ node_modules
 # # folder (does not include the current folder)
 **/*node_modules
 
+**/config/dev.js
