@@ -1,0 +1,6 @@
+node_modules
+
+# # ignores all node-modules in subdirectories recursive from the current 
+# # folder (does not include the current folder)
+**/*node_modules
+
