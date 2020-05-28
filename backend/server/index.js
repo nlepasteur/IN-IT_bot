@@ -1,9 +1,14 @@
 const express = require('express');
 
-const test = 'yoyoyo';
+const app = express();
 
-const yoyo = 'lelele';
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Welcome!',
+  });
+});
 
-function teee() {
-  const lalal = 'oké';
-}
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT);
+console.log(`Server is listening on port ${PORT}`);
