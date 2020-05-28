@@ -2,11 +2,9 @@ const express = require('express');
 
 const app = express();
 
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome!',
-  });
-});
+app.use(express.json());
+
+require('./routes/dialogFlowRoutes')(app);
 
 const PORT = process.env.PORT || 5000;
 
