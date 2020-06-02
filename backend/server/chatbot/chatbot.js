@@ -42,7 +42,6 @@ module.exports = {
 
     let responses = await sessionClient.detectIntent(request);
     responses = await self.handleAction(responses);
-    console.log('responses before return to route: ', responses);
     return responses;
   },
 
@@ -65,12 +64,13 @@ module.exports = {
     };
 
     let responses = await sessionClient.detectIntent(request);
-    responses = self.handleAction(responses);
+    responses = await self.handleAction(responses);
     return responses;
   },
 
   async handleAction(responses) {
     const self = module.exports;
+    let wanted = null;
     const { queryText } = responses[0].queryResult;
     const checkParam = Object.keys(
       responses[0].queryResult.parameters.fields
@@ -78,25 +78,30 @@ module.exports = {
 
     //
     if (checkParam === 'client') {
-      const wanted = await self.fetchAPI(queryText);
-      responses.wanted = wanted;
+      wanted = await self.fetchAPI(queryText);
     }
     //
 
-    return responses;
+    return wanted ? { responses, wanted } : responses;
   },
 
   async fetchAPI(textQuery) {
     const response = await fetch(PROJECTS_API);
     const data = await response.json();
     const client = textQuery.toLowerCase().split(' ');
+    let result;
 
     const wanted = data.filter((obj) => {
       const decomposed = [];
       for (let i = 0; i < client.length; i++) {
         decomposed.push(obj.CUSTOMER.toLowerCase().includes(client[i]));
       }
-      const result = decomposed.reduce((acc, cur) => acc + cur);
+      if (client.length > 1) {
+        result = decomposed.reduce((acc, cur) => acc + cur);
+      } else {
+        result = decomposed[0] === true ? 1 : 0;
+      }
+      // console.log('reduced: ', result);
       return result === client.length;
     });
     return wanted;

@@ -36,8 +36,9 @@ function Chatbot() {
 
     const res = await fetch('/api/df_text_query', headers);
     const data = await res.json();
+    const dfData = data.responses[0].queryResult;
 
-    for (let msg of data.fulfillmentMessages) {
+    for (let msg of dfData.fulfillmentMessages) {
       says = {
         speaks: 'bot',
         msg,
@@ -59,7 +60,7 @@ function Chatbot() {
     const res = await fetch('/api/df_event_query', headers);
     const data = await res.json();
 
-    console.log(data);
+    console.log('event DATA:', data);
 
     for (let msg of data.fulfillmentMessages) {
       let says = {
