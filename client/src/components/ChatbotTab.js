@@ -14,8 +14,6 @@ function Chatbot() {
   const [messages, setMessages] = useState([]);
   const [showBot, setShowbot] = useState(true);
 
-  console.log(cookies.get('userID'));
-
   async function df_text_query(text) {
     let says = {
       speaks: 'me',
