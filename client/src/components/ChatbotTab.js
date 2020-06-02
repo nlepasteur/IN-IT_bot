@@ -12,6 +12,7 @@ function Chatbot() {
   const endMessages = useRef(null);
   const input = useRef(null);
   const [messages, setMessages] = useState([]);
+  const [showBot, setShowbot] = useState(true);
 
   console.log(cookies.get('userID'));
 
@@ -77,8 +78,10 @@ function Chatbot() {
   }, []);
 
   useEffect(() => {
-    endMessages.current.scrollIntoView({ behaviour: 'smooth' });
-    input.current.focus();
+    if (showBot) {
+      endMessages.current.scrollIntoView({ behaviour: 'smooth' });
+      input.current.focus();
+    }
   });
 
   function renderMessages(messages) {
@@ -104,27 +107,87 @@ function Chatbot() {
     }
   }
 
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        height: 400,
-        width: 400,
-        bottom: 0,
-        right: 0,
-      }}
-    >
+  function show(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowbot(!showBot);
+  }
+
+  if (showBot) {
+    return (
       <div
-        id="chatbot"
-        style={{ height: '100%', width: '100%', overflow: 'auto' }}
+        style={{
+          height: 500,
+          width: 400,
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          border: 'solid 1px lightgrey',
+        }}
       >
-        <h2>Chatbot</h2>
-        {renderMessages(messages)}
-        <div ref={endMessages} style={{ float: 'left', clear: 'both' }}></div>
-        <input ref={input} type="text" onKeyPress={handleInputKeyPress}></input>
+        <nav>
+          <div className="nav-wrapper">
+            <a href="/" className="brand-logo">
+              Chatbot
+            </a>
+            <ul id="nav-mobile" className="right hide-on-med-and-down">
+              <li>
+                <a href="/" onClick={show}>
+                  Close
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+        <div
+          id="chatbot"
+          style={{ height: 388, width: '100%', overflow: 'auto' }}
+        >
+          {renderMessages(messages)}
+          <div ref={endMessages} style={{ float: 'left', clear: 'both' }}></div>
+        </div>
+        <div className="col s12">
+          <input
+            ref={input}
+            placeholder="Type a message"
+            type="text"
+            onKeyPress={handleInputKeyPress}
+            style={{ margin: 0, padding: '0 1% 0 1%', width: '98%' }}
+          />{' '}
+          {/* onChange setState un state, puis lorsque input submit déclenche fonction avec ce state en arg   */}
+        </div>
       </div>
-    </div>
-  );
+    );
+  } else {
+    return (
+      <div
+        style={{
+          minHeight: 40,
+          maxHeight: 500,
+          width: 400,
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          border: 'solid 1px lightgrey',
+        }}
+      >
+        <nav>
+          <div className="nav-wrapper">
+            <a href="/" className="brand-logo">
+              Chatbot
+            </a>
+            <ul id="nav-mobile" className="right hide-on-med-and-down">
+              <li>
+                <a href="/" onClick={show}>
+                  Show
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    );
+  }
 }
 
 export default Chatbot;
