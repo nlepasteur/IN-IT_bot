@@ -35,10 +35,16 @@ function Chatbot() {
       },
     };
 
+    let dfData;
+    let wanted = null;
     const res = await fetch('/api/df_text_query', headers);
     const data = await res.json();
-    const dfData = data.responses[0].queryResult;
-    const { wanted } = data;
+    if (data.responses) {
+      dfData = data.responses[0].queryResult;
+      wanted = data.wanted;
+    } else {
+      dfData = data[0].queryResult;
+    }
     console.log('wanted: ', wanted);
 
     for (let msg of dfData.fulfillmentMessages) {
@@ -49,14 +55,15 @@ function Chatbot() {
 
       setMessages((prevMessages) => [...prevMessages, says]);
     }
+    if (wanted) {
+      for (let w of wanted) {
+        says = {
+          speaks: 'bot',
+          wanted: w,
+        };
 
-    for (let w of wanted) {
-      says = {
-        speaks: 'bot',
-        wanted: w,
-      };
-
-      setMessages((prevMessages) => [...prevMessages, says]);
+        setMessages((prevMessages) => [...prevMessages, says]);
+      }
     }
   }
 
