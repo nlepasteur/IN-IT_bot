@@ -3,6 +3,7 @@ import Cookies from 'universal-cookie';
 import { v4 as uuid } from 'uuid';
 
 import Message from './Message';
+import Wanted from './Wanted';
 
 const cookies = new Cookies();
 
@@ -37,11 +38,22 @@ function Chatbot() {
     const res = await fetch('/api/df_text_query', headers);
     const data = await res.json();
     const dfData = data.responses[0].queryResult;
+    const { wanted } = data;
+    console.log('wanted: ', wanted);
 
     for (let msg of dfData.fulfillmentMessages) {
       says = {
         speaks: 'bot',
         msg,
+      };
+
+      setMessages((prevMessages) => [...prevMessages, says]);
+    }
+
+    for (let w of wanted) {
+      says = {
+        speaks: 'bot',
+        wanted: w,
       };
 
       setMessages((prevMessages) => [...prevMessages, says]);
@@ -59,8 +71,6 @@ function Chatbot() {
 
     const res = await fetch('/api/df_event_query', headers);
     const data = await res.json();
-
-    console.log('event DATA:', data);
 
     for (let msg of data.fulfillmentMessages) {
       let says = {
@@ -86,13 +96,25 @@ function Chatbot() {
   function renderMessages(messages) {
     if (messages) {
       return messages.map((message, index) => {
-        return (
-          <Message
-            key={index}
-            speaks={message.speaks}
-            text={message.msg.text.text}
-          />
-        );
+        if (message.msg) {
+          return (
+            <Message
+              key={index}
+              speaks={message.speaks}
+              text={message.msg.text.text}
+            />
+          );
+        } else if (message.wanted) {
+          return (
+            <Wanted
+              key={index}
+              speaks={message.speaks}
+              text={message.wanted.NAME}
+            />
+          );
+        } else {
+          return null;
+        }
       });
     } else {
       return null;
@@ -111,6 +133,8 @@ function Chatbot() {
     e.stopPropagation();
     setShowbot(!showBot);
   }
+
+  console.log('messages: ', messages);
 
   if (showBot) {
     return (

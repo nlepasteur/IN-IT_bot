@@ -101,7 +101,6 @@ module.exports = {
       } else {
         result = decomposed[0] === true ? 1 : 0;
       }
-      // console.log('reduced: ', result);
       return result === client.length;
     });
     return wanted;

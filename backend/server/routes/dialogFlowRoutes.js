@@ -20,7 +20,6 @@ module.exports = function (app) {
       req.userID,
       req.body.parameters
     );
-    console.log('RESPONSE: ', responses);
     res.send(responses[0].queryResult);
   });
 };
