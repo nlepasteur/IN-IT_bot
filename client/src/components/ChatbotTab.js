@@ -1,35 +1,34 @@
-import React, { useState, useReducer, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import Cookies from 'universal-cookie';
 import { v4 as uuid } from 'uuid';
 
 import Message from './Message';
 import Wanted from './Wanted';
 import { newMessage, newWanted } from '../state/actions';
-
-import { initialState, reducer } from '../state/reducer';
+import Context from '../context';
 
 const cookies = new Cookies();
 
 function Chatbot() {
   if (cookies.get('userID') === undefined)
     cookies.set('userID', uuid(), { path: '/' });
+  const { state, dispatch } = useContext(Context);
   const endMessages = useRef(null);
   const input = useRef(null);
-  const [state, dispatch] = useReducer(reducer, initialState);
   const [messages, setMessages] = useState([]);
   const [showBot, setShowbot] = useState(true);
 
   async function df_text_query(text) {
-    let says = {
-      speaks: 'me',
-      msg: {
-        text: {
-          text,
-        },
-      },
-    };
+    // let says = {
+    //   speaks: 'me',
+    //   msg: {
+    //     text: {
+    //       text,
+    //     },
+    //   },
+    // };
 
-    setMessages([...messages, says]);
+    // setMessages([...messages, says]);
     dispatch(newMessage(text, 'me'));
 
     const headers = {
@@ -53,25 +52,25 @@ function Chatbot() {
 
     for (let msg of dfData.fulfillmentMessages) {
       console.log('message!!!: ', msg);
-      says = {
-        speaks: 'bot',
-        msg,
-      };
+      // says = {
+      //   speaks: 'bot',
+      //   msg,
+      // };
 
       // newMessage(msg)
 
-      setMessages((prevMessages) => [...prevMessages, says]);
+      // setMessages((prevMessages) => [...prevMessages, says]);
       dispatch(newMessage(msg.text.text, 'bot'));
     }
     if (wanted) {
       for (let w of wanted) {
-        says = {
-          speaks: 'bot',
-          wanted: w,
-        };
+        // says = {
+        //   speaks: 'bot',
+        //   wanted: w,
+        // };
 
-        setMessages((prevMessages) => [...prevMessages, says]);
-        dispatch(newWanted(w, 'me'));
+        // setMessages((prevMessages) => [...prevMessages, says]);
+        dispatch(newWanted(w, 'bot'));
       }
     }
   }
@@ -94,6 +93,7 @@ function Chatbot() {
         msg,
       };
 
+      dispatch(newMessage(msg.text.text, 'bot'));
       setMessages((prevMessages) => [...prevMessages, says]);
     }
   }
@@ -183,7 +183,7 @@ function Chatbot() {
           id="chatbot"
           style={{ height: 388, width: '100%', overflow: 'auto' }}
         >
-          {renderMessages(messages)}
+          {renderMessages(state.messages)}
           <div ref={endMessages} style={{ float: 'left', clear: 'both' }}></div>
         </div>
         <div className="col s12">
