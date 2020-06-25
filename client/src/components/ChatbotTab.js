@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useReducer, useEffect, useRef } from 'react';
 import Cookies from 'universal-cookie';
 import { v4 as uuid } from 'uuid';
 
 import Message from './Message';
 import Wanted from './Wanted';
+import { newMessage, newWanted } from '../state/actions';
+
+import { initialState, reducer } from '../state/reducer';
 
 const cookies = new Cookies();
 
@@ -12,6 +15,7 @@ function Chatbot() {
     cookies.set('userID', uuid(), { path: '/' });
   const endMessages = useRef(null);
   const input = useRef(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
   const [messages, setMessages] = useState([]);
   const [showBot, setShowbot] = useState(true);
 
@@ -26,6 +30,7 @@ function Chatbot() {
     };
 
     setMessages([...messages, says]);
+    dispatch(newMessage(text, 'me'));
 
     const headers = {
       method: 'POST',
@@ -45,15 +50,18 @@ function Chatbot() {
     } else {
       dfData = data[0].queryResult;
     }
-    console.log('wanted: ', wanted);
 
     for (let msg of dfData.fulfillmentMessages) {
+      console.log('message!!!: ', msg);
       says = {
         speaks: 'bot',
         msg,
       };
 
+      // newMessage(msg)
+
       setMessages((prevMessages) => [...prevMessages, says]);
+      dispatch(newMessage(msg.text.text, 'bot'));
     }
     if (wanted) {
       for (let w of wanted) {
@@ -63,6 +71,7 @@ function Chatbot() {
         };
 
         setMessages((prevMessages) => [...prevMessages, says]);
+        dispatch(newWanted(w, 'me'));
       }
     }
   }
@@ -140,6 +149,9 @@ function Chatbot() {
     e.stopPropagation();
     setShowbot(!showBot);
   }
+
+  console.log('messages: ', messages);
+  console.log('state; ', state);
 
   if (showBot) {
     return (

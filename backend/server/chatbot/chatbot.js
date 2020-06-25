@@ -75,7 +75,6 @@ module.exports = {
     let wanted = null;
     const { queryText } = responses[0].queryResult;
     const checkParam = Object.keys(responses[0].queryResult.parameters.fields);
-    console.log('checkParam: ', checkParam);
     //
     // vérifie si un seul paramètre et qu'il est client, si tel est le cas renverra dossiers liés actifs ou pas
     if (checkParam.length === 1 && checkParam[0] === 'client') {
@@ -86,9 +85,9 @@ module.exports = {
       checkParam.includes('actifs') &&
       checkParam.includes('projets')
     ) {
-      wanted = await self.fetchAPI(queryText, ACTIVES_PROJECTS_API);
-      console.log('queryText: ', queryText);
-      console.log('je contiens param actifs', checkParam);
+      const client =
+        responses[0].queryResult.parameters.fields.client.stringValue;
+      wanted = await self.fetchAPI(queryText, ACTIVES_PROJECTS_API, client);
     }
     // retourner wanted dans réponse que si présent sinon créera une erreur
     return wanted ? { responses, wanted } : responses;

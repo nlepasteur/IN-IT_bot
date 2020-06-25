@@ -1,6 +1,10 @@
 import React from 'react';
 
 function Wanted(props) {
+  // function selectProject(e){
+
+  // }
+
   return (
     <div>
       <div className="col s12 m8 offset-m2 offset-l3">
