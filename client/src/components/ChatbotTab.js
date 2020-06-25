@@ -15,7 +15,8 @@ function Chatbot() {
   const { state, dispatch } = useContext(Context);
   const endMessages = useRef(null);
   const input = useRef(null);
-  const [messages, setMessages] = useState([]);
+  // const [messages, setMessages] = useState([]);
+  const [wantedCompleted, setWantedCompleted] = useState(false);
   const [showBot, setShowbot] = useState(true);
 
   async function df_text_query(text) {
@@ -63,6 +64,7 @@ function Chatbot() {
       dispatch(newMessage(msg.text.text, 'bot'));
     }
     if (wanted) {
+      setWantedCompleted(false);
       for (let w of wanted) {
         // says = {
         //   speaks: 'bot',
@@ -72,6 +74,7 @@ function Chatbot() {
         // setMessages((prevMessages) => [...prevMessages, says]);
         dispatch(newWanted(w, 'bot'));
       }
+      setWantedCompleted(true);
     }
   }
 
@@ -94,7 +97,7 @@ function Chatbot() {
       };
 
       dispatch(newMessage(msg.text.text, 'bot'));
-      setMessages((prevMessages) => [...prevMessages, says]);
+      // setMessages((prevMessages) => [...prevMessages, says]);
     }
   }
 
@@ -107,7 +110,19 @@ function Chatbot() {
       endMessages.current.scrollIntoView({ behaviour: 'smooth' });
       input.current.focus();
     }
+    // si dernier state wanted alors event
   });
+
+  useEffect(() => {
+    // useEffect pour proposer choix après render du dernier wanted
+    if (
+      wantedCompleted &&
+      state.messages.length > 0 &&
+      Object.keys(state.messages[state.messages.length - 1]).includes('wanted')
+    ) {
+      df_event_query('wanted-follow-up');
+    }
+  }, [wantedCompleted]);
 
   function renderMessages(messages) {
     if (messages) {
@@ -150,7 +165,7 @@ function Chatbot() {
     setShowbot(!showBot);
   }
 
-  console.log('messages: ', messages);
+  // console.log('messages: ', messages);
   console.log('state; ', state);
 
   if (showBot) {

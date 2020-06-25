@@ -8,7 +8,7 @@ function Wanted(props) {
   return (
     <div>
       <div className="col s12 m8 offset-m2 offset-l3">
-        <div className="card-panel grey lighten-5 z-depth-1">
+        <div className="card-panel red lighten-5 z-depth-1">
           <div className="row valign-wrapper">
             {props.speaks === 'bot' && (
               <div className="col s2">
