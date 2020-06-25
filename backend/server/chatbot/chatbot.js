@@ -42,6 +42,7 @@ module.exports = {
 
     let responses = await sessionClient.detectIntent(request);
     responses = await self.handleAction(responses);
+    console.log('responses: ', responses);
     return responses;
   },
 
@@ -69,27 +70,42 @@ module.exports = {
   },
 
   async handleAction(responses) {
+    console.log('responses: ', responses);
     const self = module.exports;
     let wanted = null;
     const { queryText } = responses[0].queryResult;
-    const checkParam = Object.keys(
-      responses[0].queryResult.parameters.fields
-    ).join();
-
+    const checkParam = Object.keys(responses[0].queryResult.parameters.fields);
+    console.log('checkParam: ', checkParam);
     //
-    if (checkParam === 'client') {
-      wanted = await self.fetchAPI(queryText);
+    // vérifie si un seul paramètre et qu'il est client, si tel est le cas renverra dossiers liés actifs ou pas
+    if (checkParam.length === 1 && checkParam[0] === 'client') {
+      const client =
+        responses[0].queryResult.parameters.fields.client.stringValue;
+      wanted = await self.fetchAPI(queryText, PROJECTS_API, client);
+    } else if (
+      checkParam.includes('actifs') &&
+      checkParam.includes('projets')
+    ) {
+      wanted = await self.fetchAPI(queryText, ACTIVES_PROJECTS_API);
+      console.log('queryText: ', queryText);
+      console.log('je contiens param actifs', checkParam);
     }
-    //
-
+    // retourner wanted dans réponse que si présent sinon créera une erreur
     return wanted ? { responses, wanted } : responses;
   },
 
-  async fetchAPI(textQuery) {
-    const response = await fetch(PROJECTS_API);
+  // ici avait ajouté valeur par défaut en prévision d'utiliser fonction pour autres cas
+  async fetchAPI(textQuery, route, clientName) {
+    // commun
+    const response = await fetch(route);
     const data = await response.json();
-    const client = textQuery.toLowerCase().split(' ');
+    //
+    // ici ajouté condition ou switch
+    // split permet de prendre compte de tous les mots rentrés par l'user
+    // const client =
+    const client = clientName.toLowerCase().split(' ');
     let result;
+    console.log('client: ', client);
 
     const wanted = data.filter((obj) => {
       const decomposed = [];
@@ -103,6 +119,7 @@ module.exports = {
       }
       return result === client.length;
     });
+    console.log('wanted :', wanted);
     return wanted;
   },
 };

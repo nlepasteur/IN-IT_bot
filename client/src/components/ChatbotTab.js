@@ -141,8 +141,6 @@ function Chatbot() {
     setShowbot(!showBot);
   }
 
-  console.log('messages: ', messages);
-
   if (showBot) {
     return (
       <div
