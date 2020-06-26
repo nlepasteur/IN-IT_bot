@@ -52,7 +52,6 @@ function Chatbot() {
     }
 
     for (let msg of dfData.fulfillmentMessages) {
-      console.log('message!!!: ', msg);
       // says = {
       //   speaks: 'bot',
       //   msg,
