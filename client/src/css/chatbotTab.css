@@ -1,0 +1,113 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.chatbot-wrapper {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 500px;
+  width: 400px;
+  bottom: 0;
+  right: 0;
+  border: solid 1px rgb(211, 211, 211);
+}
+
+.chatbot-messages {
+  height: 400px;
+  overflow: auto;
+}
+
+
+.chatbot-wrapper-closed {
+  height: 50px;
+  width: 400px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  border: solid 1px lightgrey;
+}
+
+.chatbot-head {
+  background-color: lightgreen;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1em;
+}
+
+.chatbot-head>div {
+  font-size: 1.2em;
+}
+
+input {
+  height: 50px;
+  padding: .5em;
+}
+
+
+
+/* if (showBot) {
+  return (
+    <div className="Chatbot-wrapper">
+      <nav>
+        <div className="nav-wrapper">
+          <a href="/" className="brand-logo">
+            Chatbot
+          </a>
+          <ul id="nav-mobile" className="right hide-on-med-and-down">
+            <li>
+              <a href="/" onClick={show}>
+                Close
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div
+        id="chatbot"
+        style={{ height: 388, width: '100%', overflow: 'auto' }}
+      >
+        {renderMessages(state.messages)}
+        <div ref={endMessages} style={{ float: 'left', clear: 'both' }}></div>
+      </div>
+      <div className="col s12">
+        <input
+          ref={input}
+          placeholder="Type a message"
+          type="text"
+          onKeyPress={handleInputKeyPress}
+          style={{ margin: 0, padding: '0 1% 0 1%', width: '98%' }}
+        />{' '}
+        {/* onChange setState un state, puis lorsque input submit déclenche fonction avec ce state en arg   */
+/*}
+
+</div></div>);
+}
+
+else {
+  return (<div style= {
+        {
+        minHeight: 40,
+        maxHeight: 500,
+        width: 400,
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        border: 'solid 1px lightgrey',
+      }
+    }
+
+    > <nav> <div className="nav-wrapper"> <a href="/"className="brand-logo"> Chatbot </a> <ul id="nav-mobile"className="right hide-on-med-and-down"> <li> <a href="/"onClick= {
+      show
+    }
+
+    > Show </a> </li> </ul> </div> </nav> </div>);
+}
+}
+
+*/
