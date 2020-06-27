@@ -1,10 +1,10 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = function (test) {
-  console.log('app : ', test);
-  console.log('module.children: ', module.children);
-  console.log('createProxyMiddleware : ', createProxyMiddleware);
-  console.log('module.exports: ', module.exports);
+  // console.log('app : ', test);
+  // console.log('module.children: ', module.children);
+  // console.log('createProxyMiddleware : ', createProxyMiddleware);
+  // console.log('module.exports: ', module.exports);
 
   test.use(createProxyMiddleware('/api', { target: 'http://localhost:5000' }));
 };

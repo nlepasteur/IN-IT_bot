@@ -11,7 +11,7 @@ module.exports = function (app) {
       req.userId,
       req.body.parameters
     );
-    res.send(responses[0].queryResult);
+    res.send(responses);
   });
 
   app.post('/api/df_event_query', async (req, res) => {

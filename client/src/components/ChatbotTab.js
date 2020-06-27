@@ -1,32 +1,38 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import Cookies from 'universal-cookie';
 import { v4 as uuid } from 'uuid';
 
+import '../css/chatbotTab.css';
+
 import Message from './Message';
+import Wanted from './Wanted';
+import { newMessage, newWanted } from '../state/actions';
+import Context from '../context';
 
 const cookies = new Cookies();
 
 function Chatbot() {
   if (cookies.get('userID') === undefined)
     cookies.set('userID', uuid(), { path: '/' });
+  const { state, dispatch } = useContext(Context);
   const endMessages = useRef(null);
   const input = useRef(null);
-  const [messages, setMessages] = useState([]);
+  // const [messages, setMessages] = useState([]);
+  const [wantedCompleted, setWantedCompleted] = useState(false);
   const [showBot, setShowbot] = useState(true);
 
-  console.log(cookies.get('userID'));
-
   async function df_text_query(text) {
-    let says = {
-      speaks: 'me',
-      msg: {
-        text: {
-          text,
-        },
-      },
-    };
+    // let says = {
+    //   speaks: 'me',
+    //   msg: {
+    //     text: {
+    //       text,
+    //     },
+    //   },
+    // };
 
-    setMessages([...messages, says]);
+    // setMessages([...messages, says]);
+    dispatch(newMessage(text, 'me'));
 
     const headers = {
       method: 'POST',
@@ -36,16 +42,40 @@ function Chatbot() {
       },
     };
 
+    let dfData;
+    let wanted = null;
     const res = await fetch('/api/df_text_query', headers);
     const data = await res.json();
+    if (data.responses) {
+      dfData = data.responses[0].queryResult;
+      wanted = data.wanted;
+    } else {
+      dfData = data[0].queryResult;
+    }
 
-    for (let msg of data.fulfillmentMessages) {
-      says = {
-        speaks: 'bot',
-        msg,
-      };
+    for (let msg of dfData.fulfillmentMessages) {
+      // says = {
+      //   speaks: 'bot',
+      //   msg,
+      // };
 
-      setMessages((prevMessages) => [...prevMessages, says]);
+      // newMessage(msg)
+
+      // setMessages((prevMessages) => [...prevMessages, says]);
+      dispatch(newMessage(msg.text.text, 'bot'));
+    }
+    if (wanted) {
+      setWantedCompleted(false);
+      for (let w of wanted) {
+        // says = {
+        //   speaks: 'bot',
+        //   wanted: w,
+        // };
+
+        // setMessages((prevMessages) => [...prevMessages, says]);
+        dispatch(newWanted(w, 'bot'));
+      }
+      setWantedCompleted(true);
     }
   }
 
@@ -61,15 +91,14 @@ function Chatbot() {
     const res = await fetch('/api/df_event_query', headers);
     const data = await res.json();
 
-    console.log(data);
-
     for (let msg of data.fulfillmentMessages) {
       let says = {
         speaks: 'bot',
         msg,
       };
 
-      setMessages((prevMessages) => [...prevMessages, says]);
+      dispatch(newMessage(msg.text.text, 'bot'));
+      // setMessages((prevMessages) => [...prevMessages, says]);
     }
   }
 
@@ -82,18 +111,42 @@ function Chatbot() {
       endMessages.current.scrollIntoView({ behaviour: 'smooth' });
       input.current.focus();
     }
+    // si dernier state wanted alors event
   });
+
+  useEffect(() => {
+    // useEffect pour proposer choix après render du dernier wanted
+    if (
+      wantedCompleted &&
+      state.messages.length > 0 &&
+      Object.keys(state.messages[state.messages.length - 1]).includes('wanted')
+    ) {
+      df_event_query('wanted-follow-up');
+    }
+  }, [wantedCompleted]);
 
   function renderMessages(messages) {
     if (messages) {
       return messages.map((message, index) => {
-        return (
-          <Message
-            key={index}
-            speaks={message.speaks}
-            text={message.msg.text.text}
-          />
-        );
+        if (message.msg) {
+          return (
+            <Message
+              key={index}
+              speaks={message.speaks}
+              text={message.msg.text.text}
+            />
+          );
+        } else if (message.wanted) {
+          return (
+            <Wanted
+              key={index}
+              speaks={message.speaks}
+              text={message.wanted.NAME}
+            />
+          );
+        } else {
+          return null;
+        }
       });
     } else {
       return null;
@@ -113,79 +166,53 @@ function Chatbot() {
     setShowbot(!showBot);
   }
 
+  // console.log('messages: ', messages);
+  console.log('state; ', state);
+
   if (showBot) {
     return (
-      <div
-        style={{
-          height: 500,
-          width: 400,
-          position: 'absolute',
-          bottom: 0,
-          right: 0,
-          border: 'solid 1px lightgrey',
-        }}
-      >
-        <nav>
-          <div className="nav-wrapper">
-            <a href="/" className="brand-logo">
-              Chatbot
-            </a>
-            <ul id="nav-mobile" className="right hide-on-med-and-down">
-              <li>
-                <a href="/" onClick={show}>
-                  Close
-                </a>
-              </li>
-            </ul>
-          </div>
-        </nav>
-        <div
-          id="chatbot"
-          style={{ height: 388, width: '100%', overflow: 'auto' }}
-        >
-          {renderMessages(messages)}
-          <div ref={endMessages} style={{ float: 'left', clear: 'both' }}></div>
+      <div className="chatbot-wrapper">
+        <div className="chatbot-head">
+          <div>IN-IT chatbot</div>
+          <button onClick={show}>Close</button>
         </div>
-        <div className="col s12">
-          <input
-            ref={input}
-            placeholder="Type a message"
-            type="text"
-            onKeyPress={handleInputKeyPress}
-            style={{ margin: 0, padding: '0 1% 0 1%', width: '98%' }}
-          />{' '}
-          {/* onChange setState un state, puis lorsque input submit déclenche fonction avec ce state en arg   */}
+        <div className="chatbot-messages">
+          {renderMessages(state.messages)}
+          <div ref={endMessages}></div>
         </div>
+        <input
+          ref={input}
+          placeholder="Type a message"
+          type="text"
+          onKeyPress={handleInputKeyPress}
+        />{' '}
+        {/* onChange setState un state, puis lorsque input submit déclenche fonction avec ce state en arg   */}
       </div>
     );
   } else {
     return (
-      <div
-        style={{
-          minHeight: 40,
-          maxHeight: 500,
-          width: 400,
-          position: 'absolute',
-          bottom: 0,
-          right: 0,
-          border: 'solid 1px lightgrey',
-        }}
-      >
-        <nav>
-          <div className="nav-wrapper">
-            <a href="/" className="brand-logo">
-              Chatbot
-            </a>
-            <ul id="nav-mobile" className="right hide-on-med-and-down">
-              <li>
-                <a href="/" onClick={show}>
-                  Show
-                </a>
-              </li>
-            </ul>
-          </div>
-        </nav>
+      <div className="chatbot-wrapper-closed">
+        <div className="chatbot-head">
+          <div>IN-IT chatbot</div>
+          <button onClick={show}>Show</button>
+        </div>
+
+        {/* onChange setState un state, puis lorsque input submit déclenche fonction avec ce state en arg   */}
       </div>
+      // {/* <div>
+      //   <nav>
+      //     <div>
+      //       <a href="/">Chatbot</a>
+      //       <ul>
+      //         <li>
+      //           <a href="/" onClick={show}>
+      //             Show
+      //           </a>
+      //         </li>
+      //       </ul>
+      //     </div>
+      //   </nav>
+      // </div> */}
     );
   }
 }

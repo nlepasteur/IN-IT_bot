@@ -1,0 +1,22 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.message-wrapper {
+  background-color: lightpink;
+}
+
+.message-head {
+  background-color: lightskyblue;
+  padding: 0.2em 1em;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+}
+
+.message-message {
+  padding: 1em;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+}
