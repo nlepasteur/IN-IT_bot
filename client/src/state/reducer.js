@@ -15,6 +15,12 @@ export const reducer = (state, action) => {
         messages: [...state.messages, action.item],
       };
 
+    case 'NEW_PAYLOAD':
+      return {
+        ...state,
+        messages: [...state.messages, action.item],
+      };
+
     default:
       return state;
   }

@@ -42,7 +42,6 @@ module.exports = {
 
     let responses = await sessionClient.detectIntent(request);
     responses = await self.handleAction(responses);
-    console.log('responses: ', responses);
     return responses;
   },
 
@@ -65,12 +64,12 @@ module.exports = {
     };
 
     let responses = await sessionClient.detectIntent(request);
+
     responses = await self.handleAction(responses);
     return responses;
   },
 
   async handleAction(responses) {
-    console.log('responses: ', responses);
     const self = module.exports;
     let wanted = null;
     const { queryText } = responses[0].queryResult;
@@ -104,7 +103,6 @@ module.exports = {
     // const client =
     const client = clientName.toLowerCase().split(' ');
     let result;
-    console.log('client: ', client);
 
     const wanted = data.filter((obj) => {
       const decomposed = [];
@@ -118,7 +116,6 @@ module.exports = {
       }
       return result === client.length;
     });
-    console.log('wanted :', wanted);
     return wanted;
   },
 };

@@ -5,18 +5,24 @@
 }
 
 .message-wrapper {
+  margin: 0.5em;
+  border-radius: 10px;
   background-color: lightpink;
 }
 
 .message-head {
-  background-color: lightskyblue;
-  padding: 0.2em 1em;
+  display: flex;
+  padding: 0.5em 1em 0 1em;
   font-family: 'Roboto', sans-serif;
   font-weight: 400;
 }
 
+.message-head div:first-child {
+  margin-right: 1em;
+}
+
 .message-message {
-  padding: 1em;
+  padding: 0.5em 1em;
   font-family: 'Roboto', sans-serif;
   font-weight: 300;
 }

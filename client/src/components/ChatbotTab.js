@@ -3,10 +3,11 @@ import Cookies from 'universal-cookie';
 import { v4 as uuid } from 'uuid';
 
 import '../css/chatbotTab.css';
+import '../css/wanteds.css';
 
 import Message from './Message';
 import Wanted from './Wanted';
-import { newMessage, newWanted } from '../state/actions';
+import { newMessage, newWanted, newPayload } from '../state/actions';
 import Context from '../context';
 
 const cookies = new Cookies();
@@ -20,6 +21,7 @@ function Chatbot() {
   // const [messages, setMessages] = useState([]);
   const [wantedCompleted, setWantedCompleted] = useState(false);
   const [showBot, setShowbot] = useState(true);
+  const [inputValue, setInputValue] = useState('');
 
   async function df_text_query(text) {
     // let says = {
@@ -32,7 +34,7 @@ function Chatbot() {
     // };
 
     // setMessages([...messages, says]);
-    dispatch(newMessage(text, 'me'));
+    dispatch(newMessage(text, 'Me'));
 
     const headers = {
       method: 'POST',
@@ -62,7 +64,7 @@ function Chatbot() {
       // newMessage(msg)
 
       // setMessages((prevMessages) => [...prevMessages, says]);
-      dispatch(newMessage(msg.text.text, 'bot'));
+      dispatch(newMessage(msg.text.text, 'Bot'));
     }
     if (wanted) {
       setWantedCompleted(false);
@@ -73,7 +75,7 @@ function Chatbot() {
         // };
 
         // setMessages((prevMessages) => [...prevMessages, says]);
-        dispatch(newWanted(w, 'bot'));
+        dispatch(newWanted(w, 'Bot'));
       }
       setWantedCompleted(true);
     }
@@ -91,13 +93,19 @@ function Chatbot() {
     const res = await fetch('/api/df_event_query', headers);
     const data = await res.json();
 
-    for (let msg of data.fulfillmentMessages) {
-      let says = {
-        speaks: 'bot',
-        msg,
-      };
+    console.log('data: ', data);
 
-      dispatch(newMessage(msg.text.text, 'bot'));
+    for (let msg of data.fulfillmentMessages) {
+      // let says = {
+      //   speaks: 'Bot',
+      //   msg,
+      // };
+      if (!Object.keys(msg).includes('payload')) {
+        console.log('MESSAGE SUITE A EVENT: ', msg);
+        dispatch(newMessage(msg.text.text, 'Bot'));
+      } else {
+        dispatch(newPayload(msg, 'Bot'));
+      }
       // setMessages((prevMessages) => [...prevMessages, says]);
     }
   }
@@ -125,25 +133,56 @@ function Chatbot() {
     }
   }, [wantedCompleted]);
 
+  function renderWanteds(wanteds) {
+    return (
+      <div key="uuid()" className="wanteds-wrapper">
+        {wanteds.map((w, index) => {
+          return (
+            <Wanted
+              key={uuid()}
+              speaks={w.speaks}
+              w={w}
+              addProject={addProject}
+            />
+          );
+        })}
+      </div>
+    );
+  }
+
   function renderMessages(messages) {
+    let wanteds = [];
+    console.log('MESSAGES: ', messages);
     if (messages) {
       return messages.map((message, index) => {
-        if (message.msg) {
+        if (message.payload) {
+          return message.payload.payload.fields.options.listValue.values.map(
+            (payload) => {
+              return <div key={uuid()}>{payload.stringValue}</div>;
+            }
+          );
+        } else if (message.msg) {
           return (
             <Message
-              key={index}
+              key={uuid()}
+              timeStamp={message.timeStamp}
               speaks={message.speaks}
               text={message.msg.text.text}
             />
           );
         } else if (message.wanted) {
-          return (
-            <Wanted
-              key={index}
-              speaks={message.speaks}
-              text={message.wanted.NAME}
-            />
-          );
+          wanteds.push(message);
+          if (index === messages.length - 1) {
+            // ici en 2 temps  permet de clean wanteds pour les wanted suivants entrecoupés de messages sans wanted (évite de réafficher même contenu)
+            const toRender = wanteds;
+            wanteds = [];
+            return renderWanteds(toRender);
+          } else if (!messages[index + 1].wanted) {
+            // ici  en 2 temps permet de clean wanteds pour les wanted suivants entrecoupés de messages sans wanted (évite de réafficher même contenu)
+            const toRender = wanteds;
+            wanteds = [];
+            return renderWanteds(toRender);
+          }
         } else {
           return null;
         }
@@ -156,7 +195,7 @@ function Chatbot() {
   function handleInputKeyPress(e) {
     if (e.key === 'Enter') {
       df_text_query(e.target.value);
-      e.target.value = '';
+      setInputValue('');
     }
   }
 
@@ -164,6 +203,11 @@ function Chatbot() {
     e.preventDefault();
     e.stopPropagation();
     setShowbot(!showBot);
+  }
+
+  function addProject(e, project) {
+    const input = document.querySelector('input');
+    input.value += `${project} / `;
   }
 
   // console.log('messages: ', messages);
@@ -181,9 +225,11 @@ function Chatbot() {
           <div ref={endMessages}></div>
         </div>
         <input
+          value={inputValue}
           ref={input}
           placeholder="Type a message"
           type="text"
+          onChange={(e) => setInputValue(e.target.value)}
           onKeyPress={handleInputKeyPress}
         />{' '}
         {/* onChange setState un state, puis lorsque input submit déclenche fonction avec ce state en arg   */}
@@ -199,20 +245,6 @@ function Chatbot() {
 
         {/* onChange setState un state, puis lorsque input submit déclenche fonction avec ce state en arg   */}
       </div>
-      // {/* <div>
-      //   <nav>
-      //     <div>
-      //       <a href="/">Chatbot</a>
-      //       <ul>
-      //         <li>
-      //           <a href="/" onClick={show}>
-      //             Show
-      //           </a>
-      //         </li>
-      //       </ul>
-      //     </div>
-      //   </nav>
-      // </div> */}
     );
   }
 }

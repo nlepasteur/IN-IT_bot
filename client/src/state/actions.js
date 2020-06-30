@@ -26,3 +26,14 @@ export const newWanted = (wanted, speaker) => {
     },
   };
 };
+
+export const newPayload = (payload, speaker) => {
+  return {
+    type: 'NEW_PAYLOAD',
+    item: {
+      id: uuid(),
+      speaks: speaker,
+      payload,
+    },
+  };
+};
