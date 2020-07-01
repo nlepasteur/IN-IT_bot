@@ -18,25 +18,27 @@ function Wanted(props) {
 
   return (
     <div className="wanted">
-      <div>client: {props.w.wanted.CUSTOMER}</div>
-      <div>projet: {props.w.wanted.NAME}</div>
-      <div>
+      <div className="active">
         {props.w.wanted.ACTIVE === 'Y' ? 'dossier ouvert' : 'dossier clos'}
       </div>
-      <button
-        disabled={disabled}
-        onClick={add}
-        style={props.buttonVisible ? { display: 'block' } : { display: 'none' }}
+      <div className="wanted-head">
+        <div>client</div>
+        <div>{props.w.wanted.CUSTOMER}</div>
+        <div>projet</div>
+        <div>{props.w.wanted.NAME}</div>
+      </div>
+
+      <div
+        className="wanted-buttons"
+        style={props.buttonVisible ? { display: 'flex' } : { display: 'none' }}
       >
-        Ajouter
-      </button>
-      <button
-        disabled={!disabled}
-        onClick={remove}
-        style={props.buttonVisible ? { display: 'block' } : { display: 'none' }}
-      >
-        Enlever
-      </button>
+        <button disabled={disabled} onClick={add}>
+          Ajouter
+        </button>
+        <button disabled={!disabled} onClick={remove}>
+          Enlever
+        </button>
+      </div>
     </div>
   );
 }
