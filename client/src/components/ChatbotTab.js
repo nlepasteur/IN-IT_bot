@@ -22,6 +22,7 @@ function Chatbot() {
   const [wantedCompleted, setWantedCompleted] = useState(false);
   const [showBot, setShowbot] = useState(true);
   const [inputValue, setInputValue] = useState('');
+  const [buttonVisible, setButtonVisible] = useState(false);
 
   async function df_text_query(text) {
     // let says = {
@@ -143,6 +144,8 @@ function Chatbot() {
               speaks={w.speaks}
               w={w}
               addProject={addProject}
+              removeProject={removeProject}
+              buttonVisible={buttonVisible}
             />
           );
         })}
@@ -158,7 +161,11 @@ function Chatbot() {
         if (message.payload) {
           return message.payload.payload.fields.options.listValue.values.map(
             (payload) => {
-              return <div key={uuid()}>{payload.stringValue}</div>;
+              return (
+                <div key={uuid()} onClick={followUp}>
+                  {payload.stringValue}
+                </div>
+              );
             }
           );
         } else if (message.msg) {
@@ -192,10 +199,22 @@ function Chatbot() {
     }
   }
 
+  function followUp(e) {
+    if (e.target.textContent === 'oui') {
+      setButtonVisible(true);
+    }
+    // console.log(e.target);
+    // console.log(e.target.textContent);
+    df_text_query(e.target.textContent);
+  }
+
   function handleInputKeyPress(e) {
     if (e.key === 'Enter') {
       df_text_query(e.target.value);
       setInputValue('');
+    }
+    if (buttonVisible === true) {
+      setButtonVisible(false);
     }
   }
 
@@ -210,7 +229,11 @@ function Chatbot() {
     input.value += `${project} / `;
   }
 
-  // console.log('messages: ', messages);
+  function removeProject(e, project) {
+    const input = document.querySelector('input');
+    input.value = input.value.replace(`${project} /`, '');
+  }
+
   console.log('state; ', state);
 
   if (showBot) {

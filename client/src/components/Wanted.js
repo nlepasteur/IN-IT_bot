@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 function Wanted(props) {
   // function selectProject(e){
-
   // }
+
+  const [disabled, setDisabled] = useState(false);
+
+  function add(e) {
+    setDisabled(!disabled);
+    props.addProject(e, props.w.wanted.NAME);
+  }
+
+  function remove(e) {
+    setDisabled(!disabled);
+    props.removeProject(e, props.w.wanted.NAME);
+  }
 
   return (
     <div className="wanted">
@@ -12,8 +23,19 @@ function Wanted(props) {
       <div>
         {props.w.wanted.ACTIVE === 'Y' ? 'dossier ouvert' : 'dossier clos'}
       </div>
-      <button onClick={(e) => props.addProject(e, props.w.wanted.NAME)}>
+      <button
+        disabled={disabled}
+        onClick={add}
+        style={props.buttonVisible ? { display: 'block' } : { display: 'none' }}
+      >
         Ajouter
+      </button>
+      <button
+        disabled={!disabled}
+        onClick={remove}
+        style={props.buttonVisible ? { display: 'block' } : { display: 'none' }}
+      >
+        Enlever
       </button>
     </div>
   );

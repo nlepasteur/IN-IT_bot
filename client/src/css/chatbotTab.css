@@ -5,6 +5,7 @@
 }
 
 .chatbot-wrapper {
+  /* overflow: hidden; */
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -17,6 +18,8 @@
 }
 
 .chatbot-messages {
+  /* overflow-x: hidden; */
+  width: 400px;
   height: 400px;
   overflow: auto;
 }
