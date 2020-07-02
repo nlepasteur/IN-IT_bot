@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 
 function Wanted(props) {
-  // function selectProject(e){
-  // }
-
   const [disabled, setDisabled] = useState(false);
 
   function add(e) {
@@ -44,17 +41,3 @@ function Wanted(props) {
 }
 
 export default Wanted;
-
-// return (
-//   <div
-//     className="wanted-wrapper"
-//   >
-//     <div className="wanted-head">
-//       <div>{props.speaks}</div>
-//       <div>{new Date(props.timeStamp).toLocaleTimeString()}</div>
-//     </div>
-
-//     <div className="wanted-message">{props.text}</div>
-//   </div>
-// );
-// }

@@ -7,7 +7,13 @@ function Message(props) {
     <div
       className="message-wrapper"
       style={
-        props.speaks === 'Bot' ? { marginLeft: '2em' } : { marginRight: '2em' }
+        props.speaks === 'Bot'
+          ? { marginLeft: '2em', backgroundColor: '#F5F7FA', color: '#092866' }
+          : {
+              marginRight: '2em',
+              backgroundColor: '#092866',
+              color: '#F5F7FA',
+            }
       }
     >
       <div className="message-head">

@@ -26,16 +26,6 @@ function Chatbot() {
   const [followUpButtonsDisabled, setFollowUpButtonsDisabled] = useState(false);
 
   async function df_text_query(text) {
-    // let says = {
-    //   speaks: 'me',
-    //   msg: {
-    //     text: {
-    //       text,
-    //     },
-    //   },
-    // };
-
-    // setMessages([...messages, says]);
     dispatch(newMessage(text, 'Me'));
 
     const headers = {
@@ -58,25 +48,11 @@ function Chatbot() {
     }
 
     for (let msg of dfData.fulfillmentMessages) {
-      // says = {
-      //   speaks: 'bot',
-      //   msg,
-      // };
-
-      // newMessage(msg)
-
-      // setMessages((prevMessages) => [...prevMessages, says]);
       dispatch(newMessage(msg.text.text, 'Bot'));
     }
     if (wanted) {
       setWantedCompleted(false);
       for (let w of wanted) {
-        // says = {
-        //   speaks: 'bot',
-        //   wanted: w,
-        // };
-
-        // setMessages((prevMessages) => [...prevMessages, says]);
         dispatch(newWanted(w, 'Bot'));
       }
       setWantedCompleted(true);
@@ -98,17 +74,12 @@ function Chatbot() {
     console.log('data: ', data);
 
     for (let msg of data.fulfillmentMessages) {
-      // let says = {
-      //   speaks: 'Bot',
-      //   msg,
-      // };
       if (!Object.keys(msg).includes('payload')) {
         console.log('MESSAGE SUITE A EVENT: ', msg);
         dispatch(newMessage(msg.text.text, 'Bot'));
       } else {
         dispatch(newPayload(msg, 'Bot'));
       }
-      // setMessages((prevMessages) => [...prevMessages, says]);
     }
   }
 
@@ -241,8 +212,6 @@ function Chatbot() {
     const input = document.querySelector('input');
     input.value = input.value.replace(`${project} /`, '');
   }
-
-  console.log('state; ', state);
 
   if (showBot) {
     return (

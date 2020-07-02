@@ -35,7 +35,8 @@
 }
 
 .chatbot-head {
-  background-color: lightgreen;
+  font-family: 'Press Start 2P', cursive;
+  background-color: rgb(229, 224, 243);
   height: 50px;
   display: flex;
   align-items: center;

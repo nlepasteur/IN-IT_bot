@@ -25,7 +25,7 @@
   margin-right: 0.5em;
   height: 190px;
   width: 190px;
-  background-color: limegreen;
+  background-color: rgb(229, 224, 243);
 }
 
 
@@ -34,12 +34,13 @@
 }
 
 .wanted .active {
+  color: white;
   z-index: 1000;
   position: absolute;
   top: -10px;
   right: -2px;
-  background-color: blueviolet;
-  padding: 0.1em;
+  background-color: #E6552E;
+  padding: 0.3em;
 }
 
 /* .wanted div:nth-child(5) {
